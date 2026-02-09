@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter Details</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #eef2f7;
+  margin: 0;
+  padding: 16px;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+h2 {
+  text-align: center;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 14px;
+  color: #374151;
+  margin-top: 10px;
+  display: block;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  background: #f9fafb;
+}
+
+textarea { resize: vertical; }
+
+button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.review-btn { background: #10b981; color: white; }
+.submit-btn { background: #2563eb; color: white; }
+.edit-btn   { background: #f59e0b; color: white; }
+
+.success {
+  text-align: center;
+  color: #059669;
+  margin-top: 12px;
+  display: none;
+}
+
+.error {
+  text-align: center;
+  color: #dc2626;
+  margin-top: 10px;
+}
+
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="loginBox">
+  <h2>Secure Login</h2>
+  <label>Password</label>
+  <input type="number" inputmode="numeric" id="password">
+  <button class="submit-btn" onclick="login()">Login</button>
+  <p class="error hidden" id="loginError">Invalid Password</p>
+</div>
+
+<!-- FORM -->
+<div class="container hidden" id="formBox">
+
+<h2>Enter Details</h2>
+
+<div id="formSection">
+
+<label>Name</label>
+<input id="name">
+
+<label>Designation</label>
+<input id="designation">
+
+<label>Sex</label>
+<select id="sex">
+  <option value="">Select</option>
+  <option>Male</option>
+  <option>Female</option>
+  <option>Other</option>
+</select>
+
+<label>Date of Birth (DD/MM/YYYY)</label>
+<input id="dob" placeholder="DD/MM/YYYY" onblur="calculateAge()">
+
+<label>Age</label>
+<input id="age" type="number" readonly>
+
+<label>Date of Appointment (DD/MM/YYYY)</label>
+<input id="doj" placeholder="DD/MM/YYYY">
+
+<label>Date of Retirement (DD/MM/YYYY)</label>
+<input id="dor" placeholder="DD/MM/YYYY">
+
+<label>Temporary Address</label>
+<textarea id="tempAddress"></textarea>
+
+<label>Permanent Address</label>
+<textarea id="permAddress"></textarea>
+
+<label>Mobile No</label>
+<input type="number" inputmode="numeric" id="mobile">
+
+<label>WhatsApp No</label>
+<input type="number" inputmode="numeric" id="whatsapp">
+
+<label>Email Id</label>
+<input type="email" id="email">
+
+<label>Identity Document Type</label>
+<select id="idType">
+  <option value="">Select</option>
+  <option>Aadhar</option>
+  <option>PAN</option>
+  <option>Voter ID</option>
+</select>
+
+<label>Identity Document Number</label>
+<input type="number" inputmode="numeric" id="idNumber">
+
+<button class="review-btn" onclick="showReview()">Review</button>
+</div>
+
+<!-- REVIEW -->
+<div id="reviewSection" class="hidden">
+  <h3>Please Review Your Details</h3>
+  <div id="reviewContent"></div>
+
+  <button class="edit-btn" onclick="editData()">Edit</button>
+  <button class="submit-btn" onclick="submitForm()">Submit</button>
+</div>
+
+<p class="success" id="successMsg">✅ Data submitted successfully</p>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKZSNqikVxbQO3dJC6R2z5sin_jNmd9RNKUR7hZEadomAO7A0d-4DWJIL9y7U7snJv/exec";
+const LOGIN_PASSWORD = "0512005";
+
+function login() {
+  if (password.value === LOGIN_PASSWORD) {
+    loginBox.classList.add("hidden");
+    formBox.classList.remove("hidden");
+  } else {
+    loginError.classList.remove("hidden");
+  }
+}
+
+function calculateAge() {
+  const p = dob.value.split("/");
+  if (p.length === 3 && p[2]) {
+    age.value = new Date().getFullYear() - parseInt(p[2]);
+  }
+}
+
+function showReview() {
+  formSection.classList.add("hidden");
+  reviewSection.classList.remove("hidden");
+
+  let html = "";
+  document.querySelectorAll("#formSection input, #formSection textarea, #formSection select")
+    .forEach(el => {
+      const label = el.previousElementSibling.innerText;
+      html += `<p><b>${label}:</b> ${el.value || "-"}</p>`;
+    });
+
+  reviewContent.innerHTML = html;
+}
+
+function editData() {
+  reviewSection.classList.add("hidden");
+  formSection.classList.remove("hidden");
+}
+
+function clearForm() {
+  document.querySelectorAll("#formSection input, #formSection textarea, #formSection select")
+    .forEach(el => el.value = "");
+  age.value = "";
+}
+
+function submitForm() {
+  const data = {
+    name: name.value,
+    designation: designation.value,
+    sex: sex.value,
+    dob: dob.value,
+    age: age.value,
+    doj: doj.value,
+    dor: dor.value,
+    tempAddress: tempAddress.value,
+    permAddress: permAddress.value,
+    mobile: mobile.value,
+    whatsapp: whatsapp.value,
+    email: email.value,
+    idType: idType.value,
+    idNumber: idNumber.value
+  };
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  }).then(() => {
+    reviewSection.classList.add("hidden");
+    successMsg.style.display = "block";
+
+    setTimeout(() => {
+      successMsg.style.display = "none";
+      clearForm();
+      formSection.classList.remove("hidden");
+    }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>
